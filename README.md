@@ -4,10 +4,10 @@ Django-GSheets is a library to export data fron Django to Google Sheets
   
 ## Installation  
   
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.  
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install Django-GSheets-Export.  
   
 ```bash  
-pip install django_sheets
+  pip install Django-GSheets-Export
 ```  
   
 ## Usage  
