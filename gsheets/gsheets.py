@@ -17,13 +17,8 @@ class GoogleSheets:
 
     It requires the following packages:
         - google-api-python-client
-        - google-auth-httplib2
-        - google-auth-oauthlib
         - google-auth
-        - google-auth-httplib2
-        - google-auth-oauthlib
-        - google-auth1
-        - google-auth2
+
 
     Attributes:
         SCOPES (list): List of authorization scopes required by Google Sheets and Google Drive API.
@@ -45,20 +40,22 @@ class GoogleSheets:
     """
     SCOPES = ['https://www.googleapis.com/auth/drive',
               'https://www.googleapis.com/auth/spreadsheets']
-    sheet_service = None
-    drive_service = None
-    spreadsheet_id = ''
-    spreadsheet = None
-    url = ''
-    expiration_days = 15
     roles = ['owner', 'organizer', 'fileOrganizer', 'writer', 'commenter', 'reader']
-    role = 'reader'
     types = ['user', 'group', 'domain']  # 'anyone'
-    type = 'user'
+
 
     # valores = None
 
     def __init__(self):
+
+        self.sheet_service = None
+        self.drive_service = None
+        self.spreadsheet_id = ''
+        self.spreadsheet = None
+        self.url = ''
+        self.expiration_days = 15
+        self.role = 'reader'
+        self.type = 'user'
 
         cred_file = getattr(settings, "GOOGLE_APPLICATION_CREDENTIALS_PATH", None)
 
@@ -171,6 +168,12 @@ class GoogleSheets:
 
     def share(self, email):
 
+        if self.role not in self.roles:
+            raise Exception(f"Role {self.role} not supported")
+
+        if self.type not in self.types:
+            raise Exception(f"Type {self.type} not supported")
+
         user_permission = ({'type': self.type,
                             'role': self.role,
                             'emailAddress': email,
@@ -196,9 +199,7 @@ class GoogleSheets:
         return self.url
 
 
-def main():
-    print('Hello')
+    def delete(self, file_id):
+        body_value = {'trashed': True}
 
-
-if __name__ == "__main__":
-    main()
+        response = self.drive_service.files().update(fileId=file_id, body=body_value).execute()
