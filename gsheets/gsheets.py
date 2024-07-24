@@ -122,8 +122,8 @@ class GoogleSheets:
             representation of the queryset, with the field names as the first row and the queryset data as the
             following rows. :rtype: list
             """
-            fields = [f.name for f in queryset.model._meta.fields]
-            fields_labels = [f.verbose_name for f in queryset.model._meta.fields]
+            fields = [f.name for f in queryset[0]._meta.fields]
+            fields_labels = [f.verbose_name for f in queryset[0]._meta.fields]
 
             seria = serializers.serialize("json", queryset=queryset, cls=DjangoJSONEncoder,
                                           use_natural_foreign_keys=True,
@@ -137,8 +137,12 @@ class GoogleSheets:
 
             return data
 
+        if not values:
+            raise Exception('No data to update')
+
         if isinstance(values, QuerySet):
             _values = queryset_to_list(values)
+
         elif isinstance(values, dict):
             _values = dict_to_list(values)
         elif isinstance(values, list):
@@ -199,7 +203,12 @@ class GoogleSheets:
         return self.url
 
 
-    def delete(self, file_id):
-        body_value = {'trashed': True}
+    def delete(self, file_id,permanet=False):
 
-        response = self.drive_service.files().update(fileId=file_id, body=body_value).execute()
+        if permanet:
+            response = self.drive_service.files().delete(fileId=file_id).execute()
+        else:
+            body_value = {'trashed': True}
+            response = self.drive_service.files().update(fileId=file_id, body=body_value).execute()
+
+        return response
